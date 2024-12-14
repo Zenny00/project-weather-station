@@ -33,4 +33,4 @@ This project will require several hardware components that I do not currently ow
 
 ### Project Diagram
 
-![An overview of the project architecture](./docs/images/project-weather-station-diagram.png)
+![An overview of the project architecture](./docs/images/project-weather-station-diagram.jpeg)
