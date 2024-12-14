@@ -32,3 +32,5 @@ This project will require several hardware components that I do not currently ow
 - [x] [Raspberry Pi Pico W](https://www.amazon.com/Raspberry-Pi-Pico-Wireless-Bluetooth/dp/B0B5H17CMK/ref=sr_1_3?crid=3L2MKP6HIN3ZH&dib=eyJ2IjoiMSJ9.TRC16-4mmKR3cHUH3tLkYqwTaizkohLAInTj4zyLoJQrMK7AJHOTgfdzlYV5QXjf6eek4zJRsfYOfbehadvxvtQdCHPriARZ8wKxUDXOenSYlwz0gysoejFjHHfwZNYlCWHJq9rekmhFESqr7eLaXacTbQJCTHyUYK1pixmPk0_eKMEF9TsY7WuE2nWdPQHWYlU2AQ9hnJWJqGf_7608wDFccfBADF2W41zwlgp7r2jAofCloOZB11SobEBxv17ZjoISaSgkFWXRJ5YvzUJTtQY1FVDdEBTtDxYG_7kN-0Y.YKPqaJMVDK9X_gOIkAoMu8inxNZYMleIKsgYjti2Jg8&dib_tag=se&keywords=raspberry+pi+pico&qid=1734203484&s=electronics&sprefix=raspberry+pi+pico%2Celectronics%2C115&sr=1-3)
 
 ### Project Diagram
+
+![An overview of the project architecture](./docs/images/project-weather-station-diagram.png)
