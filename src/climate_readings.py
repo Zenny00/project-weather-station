@@ -3,6 +3,7 @@ from utime import sleep, localtime
 import dht
 import temperature
 import network
+import os
 
 # The object representing the DHT11 temperature and humidity sensor
 sensor = dht.DHT11(Pin(22))
@@ -10,6 +11,14 @@ sensor = dht.DHT11(Pin(22))
 board_led = Pin("LED", Pin.OUT)
 
 # Connect to the wifi network
+ssid = None
+password = None
+try:
+    wifi_credentials = open("wifi_credentials", "r")
+    ssid, password = wifi_credentials.readlines()
+    print(ssid, password)
+except OSError as error:
+    print(f"Could not read WiFi credential file {error}")
 
 # Initialize the Real Time Clock (RTC) from the Network Time Protocol (NTP)
 
