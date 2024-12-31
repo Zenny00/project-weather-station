@@ -1,12 +1,17 @@
-from machine import Pin
+from machine import Pin, RTC
 from utime import sleep, localtime
 import dht
 import temperature
+import network
 
 # The object representing the DHT11 temperature and humidity sensor
 sensor = dht.DHT11(Pin(22))
 # The LED on the board, used to indicate when a reading is being taken
 board_led = Pin("LED", Pin.OUT)
+
+# Connect to the wifi network
+
+# Initialize the Real Time Clock (RTC) from the Network Time Protocol (NTP)
 
 # We want to continually log temperature data, we create an array of objects to capture readings
 readings = []
