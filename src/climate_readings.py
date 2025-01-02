@@ -2,8 +2,7 @@ from machine import Pin, RTC
 from utime import sleep, localtime
 import dht
 import temperature
-import network
-import os
+import networking
 
 # The object representing the DHT11 temperature and humidity sensor
 sensor = dht.DHT11(Pin(22))
@@ -15,8 +14,8 @@ ssid = None
 password = None
 try:
     wifi_credentials = open("wifi_credentials", "r")
-    ssid, password = wifi_credentials.readlines()
-    print(ssid, password)
+    ssid, password = [line.strip() for line in wifi_credentials.readlines()]
+    networking.connect_to_network(ssid, password)
 except OSError as error:
     print(f"Could not read WiFi credential file {error}")
 
