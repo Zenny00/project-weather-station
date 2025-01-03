@@ -6,7 +6,8 @@ def connect_to_network(ssid, password):
     # Connect to the WiFi network
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    wlan.connect(ssid, password, channel=2)
+    print(wlan.scan)
+    wlan.connect(ssid, password)
     
     # Wait for Wi-Fi connection
     connection_timeout = 10
