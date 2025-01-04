@@ -34,4 +34,7 @@ A single measurement taken by a weather station
 - **precipitation**: The total precipitation at the station since the last measurement (cm)
 - **pressure**: The pressure at the station (mb)
 - **wind_speed**: The wind speed at the station (m/s)
+- **wind_direction**: The direction the wind is blowing (degrees)
+- **light_level**: The current light level, stored as a decimal number
+- **description**: A brief description of the current conditions
 
