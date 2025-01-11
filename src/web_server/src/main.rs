@@ -14,6 +14,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tower_http::services::ServeDir;
 
+mod database;
+use database::database::{get_database_credentials, DatabaseCredentials};
+
 #[derive(Debug, Serialize)]
 struct City {
     name: String,
@@ -22,17 +25,6 @@ struct City {
 
 #[tokio::main]
 async fn main() {
-    /**
-    let db_credentials = std::fs::read_to_string("../db_credentials")
-        .unwrap()
-        .lines()
-        .map(String::from)
-        .collect()
-        .expect("Error opening DB credentials");
-
-    let username: &str = db_credentials[0];
-    let password: &str = db_credentials[1];
-    */
     let routes_all = Router::new()
         .merge(Router::new().route("/get_cities", get(get_cities)))
         .merge(Router::new().route("/get_cities_from_db", get(get_cities_from_db)))
@@ -74,13 +66,28 @@ async fn get_cities() -> Result<(StatusCode, Json<Vec<City>>), (StatusCode, Stri
 }
 
 async fn get_cities_from_db() -> Result<(StatusCode, Json<Vec<City>>), (StatusCode, String)> {
-    let url = "postgres://weather_data";
-    let mut connection = match sqlx::postgres::PgConnection::connect(url).await {
+    // Get the credentials for the database from a file on the system
+    let credentials: DatabaseCredentials = match get_database_credentials() {
+        Ok(credentials) => credentials,
+        Err(e) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                String::from(format!("Failed to get database credentials {}.", e)),
+            ))
+        }
+    };
+
+    println!("{:?}", credentials);
+    let url = format!(
+        "postgres://{}:{}@{}:5432/weather_data",
+        credentials.username, credentials.password, credentials.ip_address
+    );
+    let mut connection = match sqlx::postgres::PgConnection::connect(&url).await {
         Ok(connection) => connection,
         Err(e) => {
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                String::from("Failed to connect to DB"),
+                String::from(format!("Failed to connect to DB: {}", e)),
             ))
         }
     };
@@ -93,7 +100,7 @@ async fn get_cities_from_db() -> Result<(StatusCode, Json<Vec<City>>), (StatusCo
         Err(e) => {
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                String::from("Failed to run query"),
+                String::from(format!("Failed to run query: {}", e)),
             ))
         }
     };
