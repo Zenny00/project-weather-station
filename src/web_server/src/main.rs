@@ -15,7 +15,7 @@ use serde_json::json;
 use tower_http::services::ServeDir;
 
 mod database;
-use database::database::{get_database_credentials, DatabaseCredentials};
+use database::database::{get_database_connection_pool, DatabaseCredentials};
 
 #[derive(Debug, Serialize)]
 struct City {
@@ -66,34 +66,18 @@ async fn get_cities() -> Result<(StatusCode, Json<Vec<City>>), (StatusCode, Stri
 }
 
 async fn get_cities_from_db() -> Result<(StatusCode, Json<Vec<City>>), (StatusCode, String)> {
-    // Get the credentials for the database from a file on the system
-    let credentials: DatabaseCredentials = match get_database_credentials() {
-        Ok(credentials) => credentials,
-        Err(e) => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                String::from(format!("Failed to get database credentials {}.", e)),
-            ))
-        }
-    };
-
-    println!("{:?}", credentials);
-    let url = format!(
-        "postgres://{}:{}@{}:5432/weather_data",
-        credentials.username, credentials.password, credentials.ip_address
-    );
-    let mut connection = match sqlx::postgres::PgConnection::connect(&url).await {
+    let connection = match get_database_connection_pool().await {
         Ok(connection) => connection,
         Err(e) => {
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                String::from(format!("Failed to connect to DB: {}", e)),
+                String::from("Failed to get connection pool"),
             ))
         }
     };
 
     let res = match sqlx::query("SELECT city, state FROM location")
-        .fetch_one(&mut connection)
+        .fetch_one(&connection)
         .await
     {
         Ok(result) => result,
