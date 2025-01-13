@@ -23,11 +23,13 @@ pub mod database {
     ///
     pub fn get_database_credentials() -> Result<DatabaseCredentials, String> {
         // Read in the credential file from the expected location and store in a vec of strings
-        let db_credentials: Vec<String> = std::fs::read_to_string("../db_credentials")
-            .expect("Could not read credential file")
-            .lines()
-            .map(|line| line.to_string())
-            .collect();
+        let db_credentials: Vec<String> = std::fs::read_to_string(
+            std::env::var("CARGO_MANIFEST_DIR").unwrap() + "/db_credentials",
+        )
+        .expect("Could not read credential file")
+        .lines()
+        .map(|line| line.to_string())
+        .collect();
 
         // Return an error to the user if an invalid number of values are present in the input file
         if db_credentials.len() != 3 {

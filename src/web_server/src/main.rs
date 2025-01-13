@@ -43,7 +43,10 @@ async fn main() {
 }
 
 fn routes_static() -> Router {
-    Router::new().nest_service("/pages", ServeDir::new("pages"))
+    Router::new().nest_service(
+        "/pages",
+        ServeDir::new(std::env::var("CARGO_MANIFEST_DIR").unwrap() + "/src/pages"),
+    )
 }
 
 #[debug_handler]
