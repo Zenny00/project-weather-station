@@ -10,30 +10,73 @@
   </head>
 
   <body class="bg-violet-900">
-  <!-- Navigation bar-->
-   <div class="bg-violet-600 w-[5%] h-screen space-y-[100%]">
-      <!-- Weather page -->
-      <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
-        <img class="w-[90%] h-[90%] mx-auto" src="./resources/weather-page-icon.svg" alt="Image of sun obscured by clouds">
-        <div class="font-sageo mx-auto text-slate-50 mt-[20%] text-center text-[90%] font-medium">Weather</div>
+    <div class="flex flex-row">
+    <!-- Navigation bar-->
+     <div class="bg-violet-600 w-[5%] h-screen space-y-[100%]">
+        <!-- Weather page -->
+        <div class="pt-[200%]">
+          <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
+            <img class="w-[90%] h-[90%] mx-auto" src="./resources/weather-page-icon.svg" alt="Image of sun obscured by clouds">
+          </div>
+          <div class="font-sageo mx-auto text-slate-50 text-center text-[90%] font-medium text-[80%]">Weather</div>
+        </div>
+
+        <!-- Historical page -->
+        <div>
+          <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
+            <img class="w-[90%] h-[90%] mx-auto" src="./resources/historical-page-icon.svg" alt="Image of a pie chart">
+          </div>
+          <div class="font-sageo mx-auto text-slate-50 text-center text-[90%] font-medium text-[80%]">Historical</div>
+        </div> 
+
+        <!-- Info page -->
+        <div>
+          <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
+            <img class="w-[90%] h-[90%] mx-auto" src="./resources/info-page-icon.svg" alt="Image of information icon">
+          </div>
+          <div class="font-sageo mx-auto text-slate-50 text-center text-[90%] font-medium text-[80%]">Info</div>
+        </div>
+
+        <!-- Settings page -->
+        <div>
+          <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
+            <img class="w-[90%] h-[90%] mx-auto" src="./resources/settings-page-icon.svg" alt="Image of a gear">
+          </div>
+          <div class="font-sageo mx-auto text-slate-50 text-center text-[90%] font-medium text-[80%]">Settings</div>
+        </div>
       </div>
 
-      <!-- Historical page -->
-      <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
-        <img class="w-[90%] h-[90%] mx-auto" src="./resources/historical-page-icon.svg" alt="Image of a pie chart">
-        <div class="font-sageo mx-auto text-slate-50 mt-[20%] text-center text-[90%] font-medium">Historical</div>
-      </div>
+      <!-- Main content -->
+      <div class="w-[85%] h-[80vh] bg-slate-100 ml-[5%] mt-[5%] rounded-xl grid grid-cols-3">
+        <!-- Current -->
+        <div class="w-[25%] h-[20%] bg-slate-400 rounded-lg">
+          00
+        </div>
 
-      <!-- Info page -->
-      <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
-        <img class="w-[90%] h-[90%] mx-auto" src="./resources/info-page-icon.svg" alt="Image of information icon">
-        <div class="font-sageo mx-auto text-slate-50 mt-[20%] text-center text-[90%] font-medium">Info</div>
-      </div>
+        <!-- 1 Hour Ago -->
+        <div class="w-[25%] h-[20%] bg-slate-400 rounded-lg">
+          10
+        </div>
 
-      <!-- Settings page -->
-      <div class="bg-purple-400 w-[75%] h-[7.5%] rounded-lg mx-auto content-center hover:bg-purple-200">
-        <img class="w-[90%] h-[90%] mx-auto" src="./resources/settings-page-icon.svg" alt="Image of a gear">
-        <div class="font-sageo mx-auto text-slate-50 mt-[20%] text-center text-[90%] font-medium">Settings</div>
+        <!-- 2 Hours Ago -->
+        <div class="w-[25%] h-[20%] bg-slate-400 rounded-lg">
+          20
+        </div>
+
+        <!-- 3 Hours Ago -->
+        <div class="w-[25%] h-[20%] bg-slate-400 rounded-lg">
+          30
+        </div>
+
+        <!-- 4 Hours Ago -->
+        <div class="w-[25%] h-[20%] bg-slate-400 rounded-lg">
+          40
+        </div>
+
+        <!-- 5 Hours Ago -->
+        <div class="w-[25%] h-[20%] bg-slate-400 rounded-lg">
+          50
+        </div>
       </div>
     </div>
   </body>
