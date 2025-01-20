@@ -12,8 +12,8 @@ async function add_cities_to_select(selectId) {
     .catch(error => console.log(error));
 
   var option = document.createElement("option");
-  option.text = cities[0].name + ", " + cities[0].state;
-  option.value = cities[0].name; 
+  option.text = cities[0].city + ", " + cities[0].state;
+  option.value = cities[0].city; 
   var select = document.getElementById(selectId);
   select.appendChild(option);
 }

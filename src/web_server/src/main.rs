@@ -20,17 +20,20 @@ mod database;
 use database::database::get_database_connection_pool;
 
 #[derive(Debug, Serialize)]
-struct City {
-    name: String,
+struct Location {
+    location_id: String,
+    city: String,
     state: String,
 }
+
+#[derive(Debug, Serialize)]
+struct Measurement {}
 
 #[tokio::main]
 async fn main() {
     let connection_pool = get_database_connection_pool().await.unwrap();
 
     let routes_all = Router::new()
-        .route("/get_cities", get(get_cities))
         .route("/get_cities_from_db", get(get_cities_from_db))
         .with_state(connection_pool)
         .fallback_service(routes_static());
@@ -50,29 +53,13 @@ fn routes_static() -> Router {
 }
 
 #[debug_handler]
-async fn get_cities() -> Result<(StatusCode, Json<Vec<City>>), (StatusCode, String)> {
-    let cities = vec![
-        City {
-            name: String::from("Silver Spring"),
-            state: String::from("MD"),
-        },
-        City {
-            name: String::from("Chicago"),
-            state: String::from("IL"),
-        },
-    ];
-
-    return Ok((StatusCode::OK, Json(cities)));
-}
-
-#[debug_handler]
 async fn get_cities_from_db(
     State(connection_pool): State<PgPool>,
-) -> Result<(StatusCode, Json<Vec<City>>), (StatusCode, String)> {
+) -> Result<(StatusCode, Json<Vec<Location>>), (StatusCode, String)> {
     // Grab the connection pool from state
     let connection_pool = connection_pool;
 
-    let res = match sqlx::query("SELECT city, state FROM location")
+    let res = match sqlx::query("SELECT location_id, city, state FROM location")
         .fetch_one(&connection_pool)
         .await
     {
@@ -85,10 +72,18 @@ async fn get_cities_from_db(
         }
     };
 
-    let cities = vec![City {
-        name: res.get("city"),
+    let cities = vec![Location {
+        location_id: res.get("location_id"),
+        city: res.get("city"),
         state: res.get("state"),
     }];
 
     return Ok((StatusCode::OK, Json(cities)));
 }
+
+/*
+#[debug_handler]
+async fn get_readings_from_station(
+) -> Result<(StatusCode, Json<Vec<Measurement>>), (StatusCode, String)> {
+}
+*/
