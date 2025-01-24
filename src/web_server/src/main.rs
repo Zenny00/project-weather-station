@@ -9,11 +9,13 @@ use sqlx::postgres::PgPool;
 use sqlx::Row;
 use sqlx::{Connection, Pool, Postgres};
 
+use chrono::{serde::ts_seconds::serialize, DateTime, Utc};
 use std::sync::Arc;
 
 use axum_macros::debug_handler;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use serde_with::{serde_as, TimestampSeconds};
 use tower_http::services::ServeDir;
 
 mod database;
@@ -28,6 +30,15 @@ struct Location {
 
 #[derive(Debug, Serialize)]
 struct Measurement {}
+
+#[derive(Debug, Serialize)]
+struct Station {
+    station_id: String,
+    location_id: String,
+    name: String,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    start_date: DateTime<Utc>,
+}
 
 #[tokio::main]
 async fn main() {
@@ -81,9 +92,10 @@ async fn get_cities_from_db(
     return Ok((StatusCode::OK, Json(cities)));
 }
 
-/*
 #[debug_handler]
 async fn get_readings_from_station(
+    Station(station): Station,
+    State(connection_pool): State<PgPool>,
 ) -> Result<(StatusCode, Json<Vec<Measurement>>), (StatusCode, String)> {
+    todo!()
 }
-*/
