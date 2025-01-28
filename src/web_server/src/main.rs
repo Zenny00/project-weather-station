@@ -1,4 +1,5 @@
 use axum::{
+    extract::Query,
     extract::State,
     http::StatusCode,
     response::{Html, IntoResponse},
@@ -9,8 +10,8 @@ use sqlx::postgres::PgPool;
 use sqlx::Row;
 use sqlx::{Connection, Pool, Postgres};
 
-use chrono::{serde::ts_seconds::serialize, DateTime, Utc};
-use std::sync::Arc;
+use chrono::{serde::ts_seconds::serialize, DateTime, NaiveDateTime, Utc};
+use std::{os::linux::raw::stat, sync::Arc};
 
 use axum_macros::debug_handler;
 use serde::{Deserialize, Serialize};
@@ -21,21 +22,26 @@ use tower_http::services::ServeDir;
 mod database;
 use database::database::get_database_connection_pool;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Location {
     location_id: String,
     city: String,
     state: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct LocationQuery {
+    location_id: String,
+}
+
 #[derive(Debug, Serialize)]
 struct Measurement {}
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Station {
     station_id: String,
     location_id: String,
-    name: String,
+    description: String,
     #[serde(with = "chrono::serde::ts_seconds")]
     start_date: DateTime<Utc>,
 }
@@ -46,6 +52,7 @@ async fn main() {
 
     let routes_all = Router::new()
         .route("/get_cities_from_db", get(get_cities_from_db))
+        .route("/get_stations_from_db", get(get_stations_from_location))
         .with_state(connection_pool)
         .fallback_service(routes_static());
 
@@ -93,8 +100,51 @@ async fn get_cities_from_db(
 }
 
 #[debug_handler]
+async fn get_stations_from_location(
+    Query(params): Query<LocationQuery>,
+    State(connection_pool): State<PgPool>,
+) -> Result<(StatusCode, Json<Vec<Station>>), (StatusCode, String)> {
+    // Extract the location ID from the input params
+    let location_id = params.location_id;
+
+    // Grab the connection pool from state
+    let connection_pool = connection_pool;
+
+    let res = match sqlx::query(
+        "SELECT station_id, location_id, description, start_date FROM station WHERE location_id = $1",
+    )
+    .bind(location_id)
+    .fetch_all(&connection_pool)
+    .await
+    {
+        Ok(result) => result,
+        Err(e) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                String::from(format!("Failed to run query: {}", e)),
+            ))
+        }
+    };
+
+    // Format the output
+    let mut stations = Vec::new();
+    for station in res.into_iter() {
+        //        let date: NaiveDateTime = station.get("start_date");
+
+        stations.push(Station {
+            station_id: station.get("station_id"),
+            location_id: station.get("location_id"),
+            description: station.get("description"),
+            start_date: DateTime::from_timestamp(20, 31).unwrap(),
+        })
+    }
+
+    return Ok((StatusCode::OK, Json(stations)));
+}
+
+#[debug_handler]
 async fn get_readings_from_station(
-    Station(station): Station,
+    //Station(station): Station,
     State(connection_pool): State<PgPool>,
 ) -> Result<(StatusCode, Json<Vec<Measurement>>), (StatusCode, String)> {
     todo!()
