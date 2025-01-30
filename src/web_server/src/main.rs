@@ -34,8 +34,26 @@ struct LocationQuery {
     location_id: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct StationQuery {
+    station_id: String,
+}
+
 #[derive(Debug, Serialize)]
-struct Measurement {}
+struct Measurement {
+    measurement_id: String,
+    station_id: String,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    timestamp: DateTime<Utc>,
+    temperature: f32,
+    humidity: f32,
+    precipitation: f32,
+    pressure: f32,
+    wind_speed: f32,
+    wind_direction: f32,
+    light_level: f32,
+    description: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Station {
@@ -53,6 +71,10 @@ async fn main() {
     let routes_all = Router::new()
         .route("/get_cities_from_db", get(get_cities_from_db))
         .route("/get_stations_from_db", get(get_stations_from_location))
+        .route(
+            "/get_measurements_from_station",
+            get(get_measurements_from_station),
+        )
         .with_state(connection_pool)
         .fallback_service(routes_static());
 
@@ -110,6 +132,7 @@ async fn get_stations_from_location(
     // Grab the connection pool from state
     let connection_pool = connection_pool;
 
+    // Run a query against the DB to get all stations at the given location
     let res = match sqlx::query(
         "SELECT station_id, location_id, description, start_date FROM station WHERE location_id = $1",
     )
@@ -135,7 +158,7 @@ async fn get_stations_from_location(
             station_id: station.get("station_id"),
             location_id: station.get("location_id"),
             description: station.get("description"),
-            start_date: DateTime::from_timestamp(20, 31).unwrap(),
+            start_date: station.get("start_date"),
         })
     }
 
@@ -143,9 +166,50 @@ async fn get_stations_from_location(
 }
 
 #[debug_handler]
-async fn get_readings_from_station(
-    //Station(station): Station,
+async fn get_measurements_from_station(
+    Query(params): Query<StationQuery>,
     State(connection_pool): State<PgPool>,
 ) -> Result<(StatusCode, Json<Vec<Measurement>>), (StatusCode, String)> {
-    todo!()
+    // Get the station ID passed in via params
+    let station_id = params.station_id;
+
+    // Grab the connection pool from state
+    let connection_pool = connection_pool;
+
+    // Run a query against the DB to get the measurements at the given location
+    let res = match sqlx::query(
+        "SELECT measurement_id, station_id, timestamp, temperature, humidity, precipitation, pressure, wind_speed, wind_direction, light_level, description FROM measurement WHERE station_id = $1",
+    )
+    .bind(station_id)
+    .fetch_all(&connection_pool)
+    .await
+    {
+        Ok(result) => result,
+        Err(e) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                String::from(format!("Failed to run query: {}", e)),
+            ))
+        }
+    };
+
+    // Format the output
+    let mut measurements: Vec<Measurement> = Vec::new();
+    for measurement in res.into_iter() {
+        measurements.push(Measurement {
+            measurement_id: measurement.get("measurement_id"),
+            station_id: measurement.get("station_id"),
+            timestamp: measurement.get("timestamp"),
+            temperature: measurement.get("temperature"),
+            humidity: measurement.get("humidity"),
+            precipitation: measurement.get("precipitation"),
+            pressure: measurement.get("pressure"),
+            wind_speed: measurement.get("wind_speed"),
+            wind_direction: measurement.get("wind_direction"),
+            light_level: measurement.get("light_level"),
+            description: measurement.get("description"),
+        });
+    }
+
+    return Ok((StatusCode::OK, Json(measurements)));
 }

@@ -6,14 +6,30 @@ function get_cities() {
 }
 
 async function add_cities_to_select(selectId) {
+  // Fetch the data from the backend API
   const cities = await fetch("http://localhost:8080/get_cities_from_db")
     .then(response => response.json())
     .then(data => { return data })
     .catch(error => console.log(error));
-
-  var option = document.createElement("option");
-  option.text = cities[0].city + ", " + cities[0].state;
-  option.value = cities[0].city; 
+  
+  // Get the selector element from the page
   var select = document.getElementById(selectId);
-  select.appendChild(option);
+  
+  // Add an option to the dropdown for each location
+  for (var i = 0; i < cities.length; i++) {
+    var option = document.createElement("option");
+    option.text = cities[i].city + ", " + cities[i].state;
+    option.value = cities[i].location_id; 
+    select.appendChild(option);
+  }
+}
+
+async function get_stations_from_location(location_id) {
+  // Fetch the data from the backend API
+  const stations = await fetch("http://localhost:8080/get_stations_from_location?=" + location_id)
+    .then(response => response.json())
+    .then(data => { return data })
+    .catch(error => console.log(error));
+
+  return stations[0];
 }
