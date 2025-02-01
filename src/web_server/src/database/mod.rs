@@ -1,6 +1,11 @@
 pub mod database {
+    use bigdecimal::{BigDecimal, ToPrimitive};
     use chrono::{DateTime, Utc};
     use serde::{Deserialize, Serialize};
+    use sqlx::{
+        postgres::{PgPool, PgRow},
+        Row,
+    };
 
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Location {
@@ -91,7 +96,7 @@ pub mod database {
 
     /// Returns a pool of database connections that can be used to make queries in the application
     /// without starting new connections.
-    pub async fn get_database_connection_pool() -> Result<sqlx::postgres::PgPool, String> {
+    pub async fn get_database_connection_pool() -> Result<PgPool, String> {
         // Get the credentials for the database from a file on the system
         let credentials: DatabaseCredentials = match get_database_credentials() {
             Ok(credentials) => credentials,
@@ -109,5 +114,12 @@ pub mod database {
         };
 
         return Ok(pool);
+    }
+
+    pub fn get_pg_value_as_float(row: &PgRow, column: &str) -> f64 {
+        row.try_get::<BigDecimal, _>(column)
+            .ok()
+            .and_then(|v| v.to_f64())
+            .unwrap_or_default()
     }
 }

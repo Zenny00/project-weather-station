@@ -14,16 +14,18 @@ use chrono::{serde::ts_seconds::serialize, DateTime, NaiveDateTime, Utc};
 use std::{os::linux::raw::stat, sync::Arc};
 
 use axum_macros::debug_handler;
-use bigdecimal::{BigDecimal, ToPrimitive};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::{serde_as, TimestampSeconds};
-use tower_http::services::ServeDir;
 
 mod database;
 use database::database::{
-    get_database_connection_pool, Location, LocationQuery, Measurement, Station, StationQuery,
+    get_database_connection_pool, get_pg_value_as_float, Location, LocationQuery, Measurement,
+    Station, StationQuery,
 };
+
+mod server;
+use server::server::routes_static;
 
 #[tokio::main]
 async fn main() {
@@ -44,13 +46,6 @@ async fn main() {
         .unwrap();
     println!("->> LISTENING on {}\n", listener.local_addr().unwrap());
     axum::serve(listener, routes_all).await.unwrap();
-}
-
-fn routes_static() -> Router {
-    Router::new().nest_service(
-        "/pages",
-        ServeDir::new(std::env::var("CARGO_MANIFEST_DIR").unwrap() + "/src/pages"),
-    )
 }
 
 #[debug_handler]
@@ -173,11 +168,4 @@ async fn get_measurements_from_station(
     }
 
     return Ok((StatusCode::OK, Json(measurements)));
-}
-
-fn get_pg_value_as_float(row: &PgRow, column: &str) -> f64 {
-    row.try_get::<BigDecimal, _>(column)
-        .ok()
-        .and_then(|v| v.to_f64())
-        .unwrap_or_default()
 }
