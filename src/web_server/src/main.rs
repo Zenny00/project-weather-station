@@ -15,6 +15,7 @@ use server::server::{
 async fn main() {
     let connection_pool = get_database_connection_pool().await.unwrap();
 
+    // Setup routes with handler functions
     let routes_all = Router::new()
         .route("/get_cities_from_db", get(get_cities_from_db))
         .route("/get_stations_from_db", get(get_stations_from_location))
@@ -25,9 +26,7 @@ async fn main() {
         .with_state(connection_pool)
         .fallback_service(routes_static());
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
     println!("->> LISTENING on {}\n", listener.local_addr().unwrap());
     axum::serve(listener, routes_all).await.unwrap();
 }
