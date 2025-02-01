@@ -13,7 +13,7 @@ serde_json = "1.0.113"
 serde_with = "3.12.0"
 tower-http = { version="0.6.2", features=["fs"] }
 chrono = { version="0.4.39", features=["serde"]}
-
+bigdecimal = { version = "0.4.7", features = [ "serde-json" ] }
 
 # Database
-sqlx = { version = "0.8.3", features=["postgres", "runtime-tokio-rustls"]}
+sqlx = { version = "0.8.3", features=["postgres", "runtime-tokio-rustls", "chrono", "bigdecimal"]}

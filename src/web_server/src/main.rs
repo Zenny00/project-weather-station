@@ -6,7 +6,7 @@ use axum::{
     routing::get,
     Json, Router,
 };
-use sqlx::postgres::PgPool;
+use sqlx::postgres::{PgPool, PgRow};
 use sqlx::Row;
 use sqlx::{Connection, Pool, Postgres};
 
@@ -14,6 +14,7 @@ use chrono::{serde::ts_seconds::serialize, DateTime, NaiveDateTime, Utc};
 use std::{os::linux::raw::stat, sync::Arc};
 
 use axum_macros::debug_handler;
+use bigdecimal::{BigDecimal, ToPrimitive};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_with::{serde_as, TimestampSeconds};
@@ -45,13 +46,13 @@ struct Measurement {
     station_id: String,
     #[serde(with = "chrono::serde::ts_seconds")]
     timestamp: DateTime<Utc>,
-    temperature: f32,
-    humidity: f32,
-    precipitation: f32,
-    pressure: f32,
-    wind_speed: f32,
-    wind_direction: f32,
-    light_level: f32,
+    temperature: f64,
+    humidity: f64,
+    precipitation: f64,
+    pressure: f64,
+    wind_speed: f64,
+    wind_direction: f64,
+    light_level: f64,
     description: String,
 }
 
@@ -200,11 +201,11 @@ async fn get_measurements_from_station(
             measurement_id: measurement.get("measurement_id"),
             station_id: measurement.get("station_id"),
             timestamp: measurement.get("timestamp"),
-            temperature: measurement.get("temperature"),
-            humidity: measurement.get("humidity"),
-            precipitation: measurement.get("precipitation"),
-            pressure: measurement.get("pressure"),
-            wind_speed: measurement.get("wind_speed"),
+            temperature: get_pg_value_as_float(&measurement, "temperature"),
+            humidity: get_pg_value_as_float(&measurement, "humidity"),
+            precipitation: get_pg_value_as_float(&measurement, "precipitation"),
+            pressure: get_pg_value_as_float(&measurement, "pressure"),
+            wind_speed: get_pg_value_as_float(&measurement, "wind_speed"),
             wind_direction: measurement.get("wind_direction"),
             light_level: measurement.get("light_level"),
             description: measurement.get("description"),
@@ -212,4 +213,11 @@ async fn get_measurements_from_station(
     }
 
     return Ok((StatusCode::OK, Json(measurements)));
+}
+
+fn get_pg_value_as_float(row: &PgRow, column: &str) -> f64 {
+    row.try_get::<BigDecimal, _>(column)
+        .ok()
+        .and_then(|v| v.to_f64())
+        .unwrap_or_default()
 }
