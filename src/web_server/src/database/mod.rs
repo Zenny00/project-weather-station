@@ -7,6 +7,13 @@ pub mod database {
         Row,
     };
 
+    ///
+    /// A struct representing the schema of the Location table
+    /// in the postgres database
+    ///
+    /// location_id: A unique identifier for the location
+    /// city: The city in which this location resides
+    /// state: The US state in which this location resides
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Location {
         pub location_id: String,
@@ -14,16 +21,22 @@ pub mod database {
         pub state: String,
     }
 
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct LocationQuery {
-        pub location_id: String,
-    }
-
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct StationQuery {
-        pub station_id: String,
-    }
-
+    ///
+    /// A struct representing the schema of the measurement table in the
+    /// postgres database
+    ///
+    /// measurement_id: A unique indentifier for the measurement
+    /// station_id: A unique identifier for the station this measurement was taken at
+    /// timestamp: The time at which this measurement was taken (UTC)
+    /// temperature: The temperature present during the reading (degrees C)
+    /// humidity: The relative humidty present during the reading (%)
+    /// precipitation: The precipitation amount recorded since the last reading
+    /// pressure: The present pressure when the reading was taken
+    /// wind_speed: The speed at which the wind was traveling when the measurement was taken (m/s)
+    /// wind_direction: The direction in which the wind was blowing when the measurement was taken
+    /// (degrees)
+    /// light_level: The present light level at the time of the reading (TBD)
+    /// description: A plain text explaination of the conditions
     #[derive(Debug, Serialize)]
     pub struct Measurement {
         pub measurement_id: String,
@@ -40,6 +53,13 @@ pub mod database {
         pub description: String,
     }
 
+    ///
+    /// A struct representing the schema of the Station table in the postgres database
+    ///
+    /// station_id: A unique identifier representing the station
+    /// location_id: A unique identifier representing the location this station was present at
+    /// description: A description of the station in plain text
+    /// start_date: The time the station began recording data
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Station {
         pub station_id: String,
@@ -47,6 +67,24 @@ pub mod database {
         pub description: String,
         #[serde(with = "chrono::serde::ts_seconds")]
         pub start_date: DateTime<Utc>,
+    }
+
+    ///
+    /// A struct that can be used to make a param query based on location_id
+    ///
+    /// location_id: A unique identifier for the location
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct LocationQuery {
+        pub location_id: String,
+    }
+
+    ///
+    /// A struct that can be used to make a param query based on a station_id
+    ///
+    /// station_id: A unique identifier for the station
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct StationQuery {
+        pub station_id: String,
     }
 
     /// A stuct for holding information used to connect to the database server. Has the following
@@ -116,6 +154,9 @@ pub mod database {
         return Ok(pool);
     }
 
+    ///
+    /// Takes in a PgRow and string and returns the Numeric value present in the specified row
+    /// column as a f64 data type
     pub fn get_pg_value_as_float(row: &PgRow, column: &str) -> f64 {
         row.try_get::<BigDecimal, _>(column)
             .ok()
