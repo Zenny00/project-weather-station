@@ -21,49 +21,9 @@ use serde_with::{serde_as, TimestampSeconds};
 use tower_http::services::ServeDir;
 
 mod database;
-use database::database::get_database_connection_pool;
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Location {
-    location_id: String,
-    city: String,
-    state: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct LocationQuery {
-    location_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct StationQuery {
-    station_id: String,
-}
-
-#[derive(Debug, Serialize)]
-struct Measurement {
-    measurement_id: String,
-    station_id: String,
-    #[serde(with = "chrono::serde::ts_seconds")]
-    timestamp: DateTime<Utc>,
-    temperature: f64,
-    humidity: f64,
-    precipitation: f64,
-    pressure: f64,
-    wind_speed: f64,
-    wind_direction: f64,
-    light_level: f64,
-    description: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Station {
-    station_id: String,
-    location_id: String,
-    description: String,
-    #[serde(with = "chrono::serde::ts_seconds")]
-    start_date: DateTime<Utc>,
-}
+use database::database::{
+    get_database_connection_pool, Location, LocationQuery, Measurement, Station, StationQuery,
+};
 
 #[tokio::main]
 async fn main() {

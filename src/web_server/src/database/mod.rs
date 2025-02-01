@@ -1,4 +1,49 @@
 pub mod database {
+    use chrono::{DateTime, Utc};
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct Location {
+        pub location_id: String,
+        pub city: String,
+        pub state: String,
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct LocationQuery {
+        pub location_id: String,
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct StationQuery {
+        pub station_id: String,
+    }
+
+    #[derive(Debug, Serialize)]
+    pub struct Measurement {
+        pub measurement_id: String,
+        pub station_id: String,
+        #[serde(with = "chrono::serde::ts_seconds")]
+        pub timestamp: DateTime<Utc>,
+        pub temperature: f64,
+        pub humidity: f64,
+        pub precipitation: f64,
+        pub pressure: f64,
+        pub wind_speed: f64,
+        pub wind_direction: f64,
+        pub light_level: f64,
+        pub description: String,
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct Station {
+        pub station_id: String,
+        pub location_id: String,
+        pub description: String,
+        #[serde(with = "chrono::serde::ts_seconds")]
+        pub start_date: DateTime<Utc>,
+    }
+
     /// A stuct for holding information used to connect to the database server. Has the following
     /// stucture
     /// {
