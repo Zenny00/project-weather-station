@@ -1,11 +1,4 @@
 pub mod database {
-    use axum::{
-        extract::Query,
-        extract::State,
-        http::StatusCode,
-        response::{Html, IntoResponse},
-        Json, Router,
-    };
     use axum_macros::debug_handler;
     use bigdecimal::{BigDecimal, ToPrimitive};
     use chrono::{DateTime, Utc};
@@ -170,54 +163,5 @@ pub mod database {
             .ok()
             .and_then(|v| v.to_f64())
             .unwrap_or_default()
-    }
-
-    #[debug_handler]
-    pub async fn get_measurements_from_station(
-        Query(params): Query<StationQuery>,
-        State(connection_pool): State<PgPool>,
-    ) -> Result<(StatusCode, Json<Vec<Measurement>>), (StatusCode, String)> {
-        // Get the station ID passed in via params
-        let station_id = params.station_id;
-
-        // Grab the connection pool from state
-        let connection_pool = connection_pool;
-
-        // Run a query against the DB to get the measurements at the given location
-        let res = match sqlx::query(
-            "SELECT measurement_id, station_id, timestamp, temperature, humidity, precipitation, pressure, wind_speed, wind_direction, light_level, description FROM measurement WHERE station_id = $1",
-        )
-        .bind(station_id)
-        .fetch_all(&connection_pool)
-        .await
-        {
-            Ok(result) => result,
-            Err(e) => {
-                return Err((
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    String::from(format!("Failed to run query: {}", e)),
-                ))
-            }
-        };
-
-        // Format the output
-        let mut measurements: Vec<Measurement> = Vec::new();
-        for measurement in res.into_iter() {
-            measurements.push(Measurement {
-                measurement_id: measurement.get("measurement_id"),
-                station_id: measurement.get("station_id"),
-                timestamp: measurement.get("timestamp"),
-                temperature: get_pg_value_as_float(&measurement, "temperature"),
-                humidity: get_pg_value_as_float(&measurement, "humidity"),
-                precipitation: get_pg_value_as_float(&measurement, "precipitation"),
-                pressure: get_pg_value_as_float(&measurement, "pressure"),
-                wind_speed: get_pg_value_as_float(&measurement, "wind_speed"),
-                wind_direction: measurement.get("wind_direction"),
-                light_level: measurement.get("light_level"),
-                description: measurement.get("description"),
-            });
-        }
-
-        return Ok((StatusCode::OK, Json(measurements)));
     }
 }
