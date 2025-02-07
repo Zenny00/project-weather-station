@@ -664,6 +664,18 @@ video {
   height: 6rem;
 }
 
+.h-16 {
+  height: 4rem;
+}
+
+.h-4 {
+  height: 1rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
 .w-32 {
   width: 8rem;
 }
@@ -709,6 +721,18 @@ video {
 }
 
 .w-\[2rem\] {
+  width: 2rem;
+}
+
+.w-16 {
+  width: 4rem;
+}
+
+.w-28 {
+  width: 7rem;
+}
+
+.w-8 {
   width: 2rem;
 }
 
@@ -782,6 +806,11 @@ video {
 .bg-violet-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(76 29 149 / var(--tw-bg-opacity, 1));
+}
+
+.bg-slate-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity, 1));
 }
 
 .pt-\[200\%\] {
