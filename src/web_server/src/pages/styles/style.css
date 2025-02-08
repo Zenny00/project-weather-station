@@ -923,6 +923,10 @@ video {
     height: 1.5rem;
   }
 
+  .md\:h-12 {
+    height: 3rem;
+  }
+
   .md\:w-32 {
     width: 8rem;
   }
@@ -957,6 +961,10 @@ video {
 
   .md\:w-12 {
     width: 3rem;
+  }
+
+  .md\:w-40 {
+    width: 10rem;
   }
 }
 
