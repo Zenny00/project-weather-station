@@ -7,8 +7,17 @@ const applicationState = {
   wind_speed_unit: "m/s",
   get_state() {
     return { ...this };
+  },
+  set_temperature_unit(unit) {
+    this.temperature_unit = unit;
   }
 };
+
+function change_unit(unit, selectId) {
+  applicationState.set_temperature_unit(unit);
+  var select = document.getElementById(selectId);
+  select.dispatchEvent(new Event("change", { "bubbles": true }));
+}
 
 async function add_cities_to_select(selectId) {
   // Fetch the data from the backend API
