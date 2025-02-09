@@ -74,7 +74,7 @@ async function display_measurements_on_dashboard(select) {
 
 function display_title(measurement, componentId) {
   // Get the measurement timestamp and format it for display
-  const timestamp = measurement.timestamp;
+  const timestamp = new Date(measurement.timestamp).toLocaleString('en-US', { day: "numeric", month: "short" , hour: "numeric" });
   let header = document.getElementById(componentId + "_header");
   header.innerText = timestamp;
 }
