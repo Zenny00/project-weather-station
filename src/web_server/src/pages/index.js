@@ -33,3 +33,40 @@ async function get_stations_from_location(location_id) {
 
   return stations[0];
 }
+
+async function get_station_measurements(station_id) {
+  // Get the latest measurements from the station
+  const measurements = await fetch("http://localhost:8080/get_measurements_from_station?=" + station_id);
+    .then(response => response.json())
+    .then(data => { return data })
+    .catch(error => console.log(error));
+
+  return measurements;
+}
+
+async function display_measurements_on_dashboard(location_id) {
+
+  // Get the station associated with the user selected locations
+  const station_id = await get_stations_from_location(location_id)?.station_id;
+
+  // If no station is found no data should be displayed
+  if (!station_id) {
+    return;
+  }
+
+  // Get the latest (6) measurements from this station to be displayed on the dashboard
+  const measurements = await get_station_measurements(station_id);
+  
+  const componentIdPrefix = "current_conditions";
+  for (let i = 0; i < measurements.length; i++) {
+    let componentId = componentIdPrefix + "_" + i;
+    display_title(componentId);
+  }
+}
+
+function display_title(measurement, componentId) {
+  // Get the measurement timestamp and format it for display
+  const timestamp = measurement.timestamp;
+  let header = document.createElement(componentId + "_header");
+  header.innerText = timestamp;
+}
