@@ -10,11 +10,45 @@ const applicationState = {
   },
   set_temperature_unit(unit) {
     this.temperature_unit = unit;
+  },
+  set_pressure_unit(unit) {
+    this.pressure_unit = unit;
+  },
+  set_precipitation_unit(unit) {
+    this.precipitation_unit = unit;
+  },
+  set_wind_speed_unit(unit) {
+    this.wind_speed_unit = unit;
   }
 };
 
-function change_unit(unit, selectId) {
-  applicationState.set_temperature_unit(unit);
+function change_unit(system, selectId) {
+  let units;
+
+  // Set all units to imperial or metric based on user input
+  if (system === "imperial") {
+    units = {
+      temperature_unit: "F",
+      pressure_unit: "inHg",
+      precipitation_unit: "in.",
+      wind_speed_unit: "mph"
+    };
+  } else {
+    units = {
+      temperature_unit: "C",
+      pressure_unit: "mB",
+      precipitation_unit: "mm",
+      wind_speed_unit: "m/s"
+    };
+  }
+  
+  // Set unit values in the state
+  applicationState.set_temperature_unit(units.temperature_unit);
+  applicationState.set_pressure_unit(units.pressure_unit);
+  applicationState.set_precipitation_unit(units.precipitation_unit);
+  applicationState.set_wind_speed_unit(units.wind_speed_unit);
+  
+  // Call selector to re-render page content
   var select = document.getElementById(selectId);
   select.dispatchEvent(new Event("change", { "bubbles": true }));
 }
