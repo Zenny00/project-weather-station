@@ -1,10 +1,10 @@
 // Overall options for the application
 const applicationState = {
   temperature_unit: "F",
-  pressure_unit: "mB",
+  pressure_unit: "inHg",
   humidity_unit: "%",
   precipitation_unit: "in.",
-  wind_speed_unit: "m/s",
+  wind_speed_unit: "mph",
   get_state() {
     return { ...this };
   },
@@ -155,7 +155,7 @@ function display_conditions(measurement, componentId) {
   } else {
     wind_speed = measurement.wind_speed;
   }
-  wind_speed = "Wind: " + wind_speed.toFixed(1) + state.wind_speed_unit;
+  wind_speed = "Wind: " + wind_speed.toFixed(1) + " " + state.wind_speed_unit;
   
   // Get the unit to determine how to display precipitation
   let precipitation;
@@ -164,7 +164,7 @@ function display_conditions(measurement, componentId) {
   } else {
     precipitation = measurement.precipitation;
   }
-  precipitation = "Precip: " + precipitation.toFixed(1) + state.precipitation_unit;
+  precipitation = "Precip: " + precipitation.toFixed(1) + " " + state.precipitation_unit;
   
 
   let conditions_text = document.getElementById(componentId + "_text");

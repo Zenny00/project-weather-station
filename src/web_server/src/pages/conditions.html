@@ -142,12 +142,14 @@
             </div>
           </div>
         </div>
-        <fieldset>
-          <input type="radio" id="imperial_unit" name="units" value="imperial" onclick="change_unit('imperial', 'location_selector')" checked/>
-          <label for="imperial_unit">Imperial</label>
-          <input type="radio" id="metric_unit" name="units" value="metric" onclick="change_unit('metric', 'location_selector')"/>
-          <label for="metric_unit">Metric</label>
-        </fieldset>
+        <div class="w-32 md:w-48 lg:w-64 h-4 md:h-6 lg:h-8 bg-violet-200 rounded-3xl my-2 flex items-center justify-center font-sageo font-semibold">
+          <fieldset>
+            <input type="radio" id="imperial_unit" name="units" value="imperial" onclick="change_unit('imperial', 'location_selector')" checked/>
+            <label for="imperial_unit">Imperial</label>
+            <input class="ml-4" type="radio" id="metric_unit" name="units" value="metric" onclick="change_unit('metric', 'location_selector')"/>
+            <label for="metric_unit">Metric</label>
+          </fieldset>
+        </div>
       </div>
     </div>
   </body>
