@@ -22,11 +22,15 @@ async function add_cities_to_select(selectId) {
     option.value = cities[i].location_id; 
     select.appendChild(option);
   }
+
+  // Choose the first option on the initial load
+  select.value = cities[0].location_id;
+  select.dispatchEvent(new Event("change", { "bubbles": true }));
 }
 
 async function get_stations_from_location(location_id) {
   // Fetch the data from the backend API
-  const stations = await fetch("http://localhost:8080/get_stations_from_location?=" + location_id)
+  const stations = await fetch("http://localhost:8080/get_stations_from_db?location_id=" + location_id)
     .then(response => response.json())
     .then(data => { return data })
     .catch(error => console.log(error));
@@ -36,7 +40,7 @@ async function get_stations_from_location(location_id) {
 
 async function get_station_measurements(station_id) {
   // Get the latest measurements from the station
-  const measurements = await fetch("http://localhost:8080/get_measurements_from_station?=" + station_id);
+  const measurements = await fetch("http://localhost:8080/get_measurements_from_station?station_id=" + station_id)
     .then(response => response.json())
     .then(data => { return data })
     .catch(error => console.log(error));
@@ -44,29 +48,33 @@ async function get_station_measurements(station_id) {
   return measurements;
 }
 
-async function display_measurements_on_dashboard(location_id) {
+async function display_measurements_on_dashboard(select) {
+  // Get the location from the user selection
+  const location_id = select.value;
 
   // Get the station associated with the user selected locations
-  const station_id = await get_stations_from_location(location_id)?.station_id;
+  const station = await get_stations_from_location(location_id);
 
   // If no station is found no data should be displayed
-  if (!station_id) {
+  if (!station) {
     return;
   }
 
   // Get the latest (6) measurements from this station to be displayed on the dashboard
-  const measurements = await get_station_measurements(station_id);
+  const measurements = await get_station_measurements(station.station_id);
   
+  // Display the measurement data in each box
   const componentIdPrefix = "current_conditions";
   for (let i = 0; i < measurements.length; i++) {
+    let measurement = measurements[i];
     let componentId = componentIdPrefix + "_" + i;
-    display_title(componentId);
+    display_title(measurement, componentId);
   }
 }
 
 function display_title(measurement, componentId) {
   // Get the measurement timestamp and format it for display
   const timestamp = measurement.timestamp;
-  let header = document.createElement(componentId + "_header");
+  let header = document.getElementById(componentId + "_header");
   header.innerText = timestamp;
 }
