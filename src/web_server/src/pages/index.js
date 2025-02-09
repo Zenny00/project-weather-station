@@ -1,9 +1,10 @@
-function get_cities() {
-  fetch("http://localhost:8080/get_cities")
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.log(error));
-}
+// Overall options for the application
+const applicationState = {
+  temperature_unit: "F",
+  get_state() {
+    return { ...this };
+  }
+};
 
 async function add_cities_to_select(selectId) {
   // Fetch the data from the backend API
@@ -23,8 +24,7 @@ async function add_cities_to_select(selectId) {
     select.appendChild(option);
   }
 
-  // Choose the first option on the initial load
-  select.value = cities[0].location_id;
+  // Trigger the initial on change event for the 
   select.dispatchEvent(new Event("change", { "bubbles": true }));
 }
 
@@ -69,6 +69,7 @@ async function display_measurements_on_dashboard(select) {
     let measurement = measurements[i];
     let componentId = componentIdPrefix + "_" + i;
     display_title(measurement, componentId);
+    display_conditions(measurement, componentId);
   }
 }
 
@@ -77,4 +78,22 @@ function display_title(measurement, componentId) {
   const timestamp = new Date(measurement.timestamp).toLocaleString('en-US', { day: "numeric", month: "short" , hour: "numeric" });
   let header = document.getElementById(componentId + "_header");
   header.innerText = timestamp;
+}
+
+function display_conditions(measurement, componentId) {
+  const state = applicationState.get_state();
+
+  // Get values to be displayed from the measurement and format for display
+  // Get the unit to determine how to display temperature
+  let temperature;
+  if (state.temperature_unit === "F") {
+    temperature = (measurement.temperature * (9/5)) + 32;
+  } else {
+    temperature = measurement.temperature;
+  }
+  temperature = temperature.toFixed(1) + " °" + state.temperature_unit;
+
+  let conditions_text = document.getElementById(componentId + "_text");
+  conditions_text.innerText = temperature;
+
 }
