@@ -96,21 +96,23 @@ function display_conditions(measurement, componentId) {
   } else {
     temperature = measurement.temperature;
   }
-  temperature = temperature.toFixed(1) + " °" + state.temperature_unit;
+  temperature = "Temp: " + temperature.toFixed(1) + " °" + state.temperature_unit;
 
   // Get the unit to determine how to display humidity
   let humidity;
   if (state.humidity_unit === "%") {
     humidity = measurement.humidity;
   }
-  humidity = humidity.toFixed(1) + state.humidity_unit;
+  humidity = "Humidity: " + humidity.toFixed(1) + state.humidity_unit;
   
   // Get the unit to determine how to display wind speed
   let wind_speed;
-  if (state.wind_speed_unit === "m/s") {
+  if (state.wind_speed_unit === "mph") {
+    wind_speed = measurement.wind_speed * 2.237;
+  } else {
     wind_speed = measurement.wind_speed;
   }
-  wind_speed = wind_speed.toFixed(1) + state.wind_speed_unit;
+  wind_speed = "Wind: " + wind_speed.toFixed(1) + state.wind_speed_unit;
   
   // Get the unit to determine how to display precipitation
   let precipitation;
@@ -119,10 +121,9 @@ function display_conditions(measurement, componentId) {
   } else {
     precipitation = measurement.precipitation;
   }
-  precipitation = precipitation.toFixed(1) + state.precipitation_unit;
+  precipitation = "Precip: " + precipitation.toFixed(1) + state.precipitation_unit;
   
 
   let conditions_text = document.getElementById(componentId + "_text");
-  conditions_text.innerText = temperature;
-
+  conditions_text.innerHTML = temperature + "<br/>" + humidity + "<br/>" + wind_speed + "<br/>" + precipitation;
 }
