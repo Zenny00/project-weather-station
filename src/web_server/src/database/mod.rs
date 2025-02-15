@@ -139,7 +139,11 @@ pub mod database {
         // Get the credentials for the database from a file on the system
         let credentials: DatabaseCredentials = match get_database_credentials() {
             Ok(credentials) => credentials,
-            Err(e) => return Err(String::from("Failed to get database credentials")),
+            Err(e) => {
+                return Err(String::from(format!(
+                    "Failed to get database credentials: {e}"
+                )))
+            }
         };
 
         let url = format!(
@@ -149,7 +153,7 @@ pub mod database {
 
         let pool = match sqlx::postgres::PgPool::connect(&url).await {
             Ok(pool) => pool,
-            Err(e) => return Err(String::from("Failed to create pool.")),
+            Err(e) => return Err(String::from(format!("Failed to create pool. {e}"))),
         };
 
         return Ok(pool);
