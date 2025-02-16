@@ -8,18 +8,16 @@ def connect_to_network(ssid, password):
     wlan.connect(ssid, password)
     
     # Wait for Wi-Fi connection
-    connection_timeout = 10
+    connection_timeout = 20
     while connection_timeout > 0:
         if wlan.status() >= 3:
             break
         connection_timeout -= 1
-        print('Waiting for Wi-Fi connection...')
+        print("Waiting for Wi-Fi connection...")
         sleep(1)
 
     # Check if connection is successful
     if wlan.status() != 3:
-        print('Failed to establish a network connection')
+        print("Failed to establish a network connection")
     else:
-        print('Connection successful!')
-        network_info = wlan.ifconfig()
-        print('IP address:', network_info[0])
+        print("Connection successful!")

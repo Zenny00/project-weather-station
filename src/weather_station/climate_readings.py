@@ -4,29 +4,31 @@ from bmp085 import BMP180
 import dht
 import temperature
 import networking
+import database
 from bh1750 import BH1750
-import time
+import ntptime
 
 # The object representing the DHT11 temperature and humidity sensor
 sensor = dht.DHT11(Pin(22))
 
-print("past")
 # The LED on the board, used to indicate when a reading is being taken
 board_led = Pin("LED", Pin.OUT)
 
-# The I2C interface over PIN 1 and 2
-# i2c = I2C(0, sda = Pin(0), scl = Pin(1), freq = 1000)
-i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=400000)
+# The I2C interface over PIN 0 and 1 for the BMP180
+i2c_bmp = I2C(0, sda = Pin(0), scl = Pin(1), freq = 1000)
+
+# The I2C interface over PIN 5 and 4 for the BH1750
+i2c_lux = SoftI2C(scl=Pin(5), sda=Pin(4), freq=400000)
 
 # The object representing the BMP180 sensor
-# bmp = None
-# try:
-#     bmp = BMP180(i2c)
-#     bmp.oversample = 2
-#     bmp.sealevel = 101325 # Standard sea level pressure in Pascals (1013.25 mB)
-# except:
-#    print("Can't read BMP180")
-light_sensor = BH1750(bus=i2c, addr=0x23)
+bmp = None
+try:
+    bmp = BMP180(i2c_bmp)
+    bmp.oversample = 2
+    bmp.sealevel = 101325 # Standard sea level pressure in Pascals (1013.25 mB)
+except:
+   print("Can't read BMP180")
+light_sensor = BH1750(bus=i2c_lux, addr=0x23)
 
 # Connect to the wifi network
 ssid = None
@@ -38,7 +40,12 @@ try:
 except OSError as error:
     print(f"Could not read WiFi credential file {error}")
 
+# Establish a connection with the database
+connection = database.open_db_connection("./db_credentials")
+cur = connection.cursor()
+
 # Initialize the Real Time Clock (RTC) from the Network Time Protocol (NTP)
+ntptime.settime()
 
 # We want to continually log temperature data, we create an array of objects to capture readings
 readings = []
@@ -46,19 +53,19 @@ while (len(readings) < 10):
     sleep(1)
     # Turn on the LED to show a reading is being taken
     board_led.toggle()
-    sensor.measure()
     
+    # Get the current UTC time
     # Reformat time into string YYYY-MM-DDTHH:mm:ss.SSSZ
     timestamp = localtime()
     timestamp_formatted = f"{timestamp[0]}-{timestamp[1]}-{timestamp[2]}T{timestamp[3]}:{timestamp[4]}:{timestamp[5]}"
     
-    readings.append(temperature.measure_temperature_humidity(timestamp=timestamp_formatted, sensor=sensor))
-    
-    # print(bmp.temperature, bmp.pressure, bmp.altitude)
+    # Read temperature, pressure, and altitude from the BMP180 sensor
+    temperature, pressure, altitude = bmp.temperature, bmp.pressure, bmp.altitude
     lux = light_sensor.luminance(BH1750.CONT_HIRES_1)
-    print("Luminance: {:.2f} lux".format(lux))
     
     sleep(0.5)
     board_led.toggle()
     
 print(readings)
+
+connection.close()

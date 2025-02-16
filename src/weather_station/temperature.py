@@ -11,5 +11,4 @@ def measure_temperature_humidity(timestamp, sensor):
     except OSError as error:
         print(f'Failed to read the from sensor: {error}')
 
-
     return reading
