@@ -1,7 +1,11 @@
 pub mod server {
     use crate::database;
 
-    use axum::{extract::Query, extract::State, http::StatusCode, Json, Router};
+    use axum::{
+        extract::{rejection::StringRejection, Query, State},
+        http::StatusCode,
+        Json, Router,
+    };
     use axum_macros::debug_handler;
     use database::database::{
         get_pg_value_as_float, Location, LocationQuery, Measurement, Station, StationQuery,
@@ -36,7 +40,7 @@ pub mod server {
 
         // Run a query against the DB to get the measurements at the given location
         let res = match sqlx::query(
-            "SELECT measurement_id, station_id, timestamp, temperature, humidity, precipitation, pressure, wind_speed, wind_direction, light_level, description FROM measurement WHERE station_id = $1",
+            "SELECT measurement_id, station_id, timestamp, temperature, humidity, precipitation, pressure, wind_speed, wind_direction, light_level, description FROM measurement WHERE station_id = $1 ORDER BY timestamp DESC LIMIT 6",
         )
         .bind(station_id)
         .fetch_all(&connection_pool)

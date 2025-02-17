@@ -42,16 +42,16 @@ pub mod database {
     pub struct Measurement {
         pub measurement_id: String,
         pub station_id: String,
-        #[serde(with = "chrono::serde::ts_seconds")]
+        #[serde(with = "chrono::serde::ts_milliseconds")]
         pub timestamp: DateTime<Utc>,
-        pub temperature: f64,
-        pub humidity: f64,
-        pub precipitation: f64,
-        pub pressure: f64,
-        pub wind_speed: f64,
-        pub wind_direction: f64,
-        pub light_level: f64,
-        pub description: String,
+        pub temperature: Option<f64>,
+        pub humidity: Option<f64>,
+        pub precipitation: Option<f64>,
+        pub pressure: Option<f64>,
+        pub wind_speed: Option<f64>,
+        pub wind_direction: Option<f64>,
+        pub light_level: Option<f64>,
+        pub description: Option<String>,
     }
 
     ///
@@ -162,10 +162,9 @@ pub mod database {
     ///
     /// Takes in a PgRow and string and returns the Numeric value present in the specified row
     /// column as a f64 data type
-    pub fn get_pg_value_as_float(row: &PgRow, column: &str) -> f64 {
+    pub fn get_pg_value_as_float(row: &PgRow, column: &str) -> Option<f64> {
         row.try_get::<BigDecimal, _>(column)
             .ok()
             .and_then(|v| v.to_f64())
-            .unwrap_or_default()
     }
 }

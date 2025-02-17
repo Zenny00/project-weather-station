@@ -5,6 +5,7 @@ const applicationState = {
   humidity_unit: "%",
   precipitation_unit: "in.",
   wind_speed_unit: "mph",
+  timezone: "UTC",
   get_state() {
     return { ...this };
   },
@@ -110,25 +111,33 @@ async function display_measurements_on_dashboard(select) {
   // Get the latest (6) measurements from this station to be displayed on the dashboard
   const measurements = await get_station_measurements(station.station_id);
   
+  // Get the user timezone from application state
+  const timezone = applicationState.get_state().timezone;
+  
   // Display the measurement data in each box
   const componentIdPrefix = "current_conditions";
   for (let i = 0; i < measurements.length; i++) {
     let measurement = measurements[i];
     let componentId = componentIdPrefix + "_" + i;
-    display_title(measurement, componentId);
+    display_title(measurement, componentId, timezone);
     display_conditions(measurement, componentId);
   }
 }
 
-function display_title(measurement, componentId) {
+function display_title(measurement, componentId, timezone) {
   // Get the measurement timestamp and format it for display
-  const timestamp = new Date(measurement.timestamp).toLocaleString('en-US', { day: "numeric", month: "short" , hour: "numeric" });
+  let timestamp = new Date(measurement.timestamp).toLocaleString('en-US', { day: "numeric", month: "short" , hour: "numeric", timezone: timezone });
   let header = document.getElementById(componentId + "_header");
   header.innerText = timestamp;
 }
 
 function display_conditions(measurement, componentId) {
   const state = applicationState.get_state();
+
+  // Formatter to handle NULL measurement values
+  const format_measurement = (prefix, value, unit) => {
+    return prefix + (value ? value.toFixed(1) + unit : "--");
+  };
 
   // Get values to be displayed from the measurement and format for display
 
@@ -139,14 +148,14 @@ function display_conditions(measurement, componentId) {
   } else {
     temperature = measurement.temperature;
   }
-  temperature = "Temp: " + temperature.toFixed(1) + " °" + state.temperature_unit;
+  temperature = format_measurement("Temp: ", temperature, " °" + state.temperature_unit);
 
   // Get the unit to determine how to display humidity
   let humidity;
   if (state.humidity_unit === "%") {
     humidity = measurement.humidity;
   }
-  humidity = "Humidity: " + humidity.toFixed(1) + state.humidity_unit;
+  humidity = format_measurement("Humidity: ", humidity, state.humidity_unit);
   
   // Get the unit to determine how to display wind speed
   let wind_speed;
@@ -155,7 +164,7 @@ function display_conditions(measurement, componentId) {
   } else {
     wind_speed = measurement.wind_speed;
   }
-  wind_speed = "Wind: " + wind_speed.toFixed(1) + " " + state.wind_speed_unit;
+  wind_speed = format_measurement("Wind: ", wind_speed, " " + state.wind_speed_unit);
   
   // Get the unit to determine how to display precipitation
   let precipitation;
@@ -164,7 +173,7 @@ function display_conditions(measurement, componentId) {
   } else {
     precipitation = measurement.precipitation;
   }
-  precipitation = "Precip: " + precipitation.toFixed(1) + " " + state.precipitation_unit;
+  precipitation = format_measurement("Precip: ", precipitation, " " + state.precipitation_unit);
   
 
   let conditions_text = document.getElementById(componentId + "_text");
