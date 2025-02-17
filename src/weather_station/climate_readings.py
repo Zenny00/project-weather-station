@@ -67,11 +67,12 @@ while (count < 10):
     # Get the current UTC time
     # Reformat time into string YYYY-MM-DDTHH:mm:ss.SSSZ
     timestamp = localtime()
-    timestamp_formatted = f"{timestamp[0]}-{timestamp[1]}-{timestamp[2]}T{timestamp[3]}:{timestamp[4]}:{timestamp[5]}"
+    timestamp_formatted = f"{timestamp[0]}-{timestamp[1]}-{timestamp[2]}T{timestamp[3]}:{timestamp[4]}:{timestamp[5]}Z"
     
     # Read temperature, pressure, and altitude from the BMP180 sensor
-    temperature, pressure, altitude = round(bmp.temperature, 3), round(bmp.pressure / 100, 4), round(bmp.altitude, 3)
+    temperature, pressure, altitude = round(bmp.temperature, 3), round(bmp.pressure, 4), round(bmp.altitude, 3)
     lux = round(light_sensor.luminance(BH1750.CONT_HIRES_1), 4)
+    print(timestamp_formatted)
     
     # Measure humidity from the DHT11
     sensor.measure()
